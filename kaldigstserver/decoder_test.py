@@ -40,12 +40,15 @@ class DecoderPipelineTests(unittest.TestCase):
     def set_finished(cls, finished):
         cls.finished = True
 
+    def send_data(self, data_iterator):
+        for block in data_iterator:
+            time.sleep(0.25)
+            self.decoder_pipeline.process_data(block)
+
     def testCancelAfterEOS(self):
         self.decoder_pipeline.init_request("testCancelAfterEOS", "audio/x-raw, layout=(string)interleaved, rate=(int)16000, format=(string)S16LE, channels=(int)1")
         f = open("test/data/1234-5678.raw", "rb")
-        for block in iter(lambda: f.read(8000), ""):
-            time.sleep(0.25)
-            self.decoder_pipeline.process_data(block)
+        self.send_data(iter(lambda: f.read(8000), ""))
 
         self.decoder_pipeline.end_request()
         self.decoder_pipeline.cancel()
@@ -59,9 +62,7 @@ class DecoderPipelineTests(unittest.TestCase):
     def test12345678(self):
         self.decoder_pipeline.init_request("test12345678", "audio/x-raw, layout=(string)interleaved, rate=(int)16000, format=(string)S16LE, channels=(int)1")
         f = open("test/data/1234-5678.raw", "rb")
-        for block in iter(lambda: f.read(8000), ""):
-            time.sleep(0.25)
-            self.decoder_pipeline.process_data(block)
+        self.send_data(iter(lambda: f.read(8000), ""))
 
         self.decoder_pipeline.end_request()
 
@@ -73,9 +74,7 @@ class DecoderPipelineTests(unittest.TestCase):
     def testWav(self):
         self.decoder_pipeline.init_request("testWav", "")
         f = open("test/data/lause2.wav", "rb")
-        for block in iter(lambda: f.read(16000*2*2/4), ""):
-            time.sleep(0.25)
-            self.decoder_pipeline.process_data(block)
+        self.send_data(iter(lambda: f.read(16000*2*2/4), ""))
 
         self.decoder_pipeline.end_request()
 
@@ -87,9 +86,7 @@ class DecoderPipelineTests(unittest.TestCase):
     def testOgg(self):
         self.decoder_pipeline.init_request("testOgg", "")
         f = open("test/data/test_2lauset.ogg", "rb")
-        for block in iter(lambda: f.read(86*1024/8/4), ""):
-            time.sleep(0.25)
-            self.decoder_pipeline.process_data(block)
+        self.send_data(iter(lambda: f.read(86*1024/8/4), ""))
 
         self.decoder_pipeline.end_request()
 
@@ -109,9 +106,7 @@ class DecoderPipelineTests(unittest.TestCase):
         def do_shit():
             decoder_pipeline.init_request("test0", "audio/x-raw, layout=(string)interleaved, rate=(int)16000, format=(string)S16LE, channels=(int)1")
             f = open("test/data/1234-5678.raw", "rb")
-            for block in iter(lambda: f.read(8000), ""):
-                time.sleep(0.25)
-                decoder_pipeline.process_data(block)
+            self.send_data(iter(lambda: f.read(8000), ""))
             
             decoder_pipeline.end_request()
     
@@ -119,7 +114,8 @@ class DecoderPipelineTests(unittest.TestCase):
     
         while not finished[0]:
             time.sleep(1)
-        self.assertEqual(["üks", "kaks", "kolm", "neli", "<#s>", "viis", "kuus", "seitse", "kaheksa", "<#s>"], words)
+        self.assertEqual(["üks", "kaks", "kolm", "neli", "<#s>", 
+                          "viis", "kuus", "seitse", "kaheksa", "<#s>"], words)
         
         words = []
         

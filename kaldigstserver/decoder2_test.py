@@ -49,12 +49,15 @@ class DecoderPipeline2Tests(unittest.TestCase):
     def set_finished(cls, finished):
         cls.finished = True
 
+    def send_data(self, data_iterator):
+        for block in data_iterator:
+            time.sleep(0.25)
+            self.decoder_pipeline.process_data(block)
+
     def testCancelAfterEOS(self):
         self.decoder_pipeline.init_request("testCancelAfterEOS", "audio/x-raw, layout=(string)interleaved, rate=(int)16000, format=(string)S16LE, channels=(int)1")
         f = open("test/data/1234-5678.raw", "rb")
-        for block in iter(lambda: f.read(8000), ""):
-            time.sleep(0.25)
-            self.decoder_pipeline.process_data(block)
+        self.send_data(iter(lambda: f.read(8000), ""))
 
         self.decoder_pipeline.end_request()
         self.decoder_pipeline.cancel()
@@ -68,7 +71,8 @@ class DecoderPipeline2Tests(unittest.TestCase):
 
         # self.words is sequential partial transcription. Without inferring some kind of structure, it's best to just check whether this word has been transcribed
         # Unless there could be a lattice view for this
-        for word in ["üks", "kaks", "kolm", "neli", "viis", "kuus", "seitse", "kaheksa"]:
+        for word in ["üks", "kaks", "kolm", "neli", 
+                     "viis", "kuus", "seitse", "kaheksa"]:
             self.assertTrue(word.decode('utf-8') in flat_words)
 
 
@@ -77,9 +81,7 @@ class DecoderPipeline2Tests(unittest.TestCase):
         adaptation_state = open("test/data/adaptation_state.txt").read()
         self.decoder_pipeline.set_adaptation_state(adaptation_state)
         f = open("test/data/1234-5678.raw", "rb")
-        for block in iter(lambda: f.read(8000), ""):
-            time.sleep(0.25)
-            self.decoder_pipeline.process_data(block)
+        self.send_data(iter(lambda: f.read(8000), ""))
 
         self.decoder_pipeline.end_request()
 
@@ -87,15 +89,13 @@ class DecoderPipeline2Tests(unittest.TestCase):
         while not self.finished:
             time.sleep(1)
         self.assertEqual([u"üks kaks kolm neli",
-                          u"viis kuus seitse kaheksa"], 
+                          u"viis kuus seitse kaheksa"],
                          self.final_hyps)
 
     def test8k(self):
         self.decoder_pipeline.init_request("test8k", "audio/x-raw, layout=(string)interleaved, rate=(int)8000, format=(string)S16LE, channels=(int)1")
         f = open("test/data/1234-5678.8k.raw", "rb")
-        for block in iter(lambda: f.read(4000), ""):
-            time.sleep(0.25)
-            self.decoder_pipeline.process_data(block)
+        self.send_data(iter(lambda: f.read(4000), ""))
 
         self.decoder_pipeline.end_request()
 
@@ -120,9 +120,7 @@ class DecoderPipeline2Tests(unittest.TestCase):
     def testWav(self):
         self.decoder_pipeline.init_request("testWav", "")
         f = open("test/data/test_with_silence.wav", "rb")
-        for block in iter(lambda: f.read(48000*2*2/4), ""):
-            time.sleep(0.25)
-            self.decoder_pipeline.process_data(block)
+        self.send_data(iter(lambda: f.read(48000*2*2/4), ""))
 
         self.decoder_pipeline.end_request()
 

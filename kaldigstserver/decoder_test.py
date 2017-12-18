@@ -18,8 +18,7 @@ class DecoderPipelineTests(unittest.TestCase):
         super(DecoderPipelineTests, self).__init__(*args, **kwargs)
         logging.basicConfig(level=logging.INFO)
 
-    @classmethod
-    def setUpClass(cls):
+    def setUp(cls):
             decoder_conf = {"model" : "test/models/estonian/tri2b_mmi_pruned/final.mdl",
                             "lda-mat" : "test/models/estonian/tri2b_mmi_pruned/final.mat",
                             "word-syms" : "test/models/estonian/tri2b_mmi_pruned/words.txt",
@@ -35,19 +34,11 @@ class DecoderPipelineTests(unittest.TestCase):
             loop = GObject.MainLoop()
             thread.start_new_thread(loop.run, ())
 
-    @classmethod
     def word_getter(cls, word):
         cls.words.append(word)
 
-    @classmethod
     def set_finished(cls, finished):
         cls.finished = True
-
-    def setUp(self):
-        self.__class__.words = []
-        self.__class__.finished = False
-
-
 
     def testCancelAfterEOS(self):
         self.decoder_pipeline.init_request("testCancelAfterEOS", "audio/x-raw, layout=(string)interleaved, rate=(int)16000, format=(string)S16LE, channels=(int)1")
@@ -61,7 +52,8 @@ class DecoderPipelineTests(unittest.TestCase):
         while not self.finished:
             time.sleep(1)
 
-        #self.assertEqual(["üks", "kaks", "kolm", "neli", "<#s>", "viis", "kuus", "seitse", "kaheksa", "<#s>"], self.words)
+        self.assertEqual(["üks", "kaks", "kolm", "neli", "<#s>", "viis", "kuus", "seitse", "kaheksa", "<#s>"], self.words)
+        
 
 
     def test12345678(self):

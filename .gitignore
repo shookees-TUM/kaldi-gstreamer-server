@@ -3,3 +3,4 @@ test/models/estonian/*
 
 .vscode
 venv
+**/*.pyc

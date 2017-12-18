@@ -1,6 +1,6 @@
 env:
   global:
-    - CC_TEST_REPORTER_ID=6c7aa04b7c8ea5bd90845bc6dccbad4d23785e7d263be4e27214d6d0b4f457de
+    - CODECLIMATE_REPO_TOKEN=6c7aa04b7c8ea5bd90845bc6dccbad4d23785e7d263be4e27214d6d0b4f457de
 
 sudo: required
 
@@ -13,15 +13,12 @@ before_install:
   - docker pull shookees/kaldi-gstreamer-server
 
 before_script:
-  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-  - chmod +x ./cc-test-reporter
-  - ./cc-test-reporter before-build
+  - pip install codeclimate-test-reporter
 
 script:
- - docker run -v `pwd`:/opt/kaldi-gstreamer-server-test shookees/kaldi-gstreamer-server bash -c "pip install coverage &&
+ - docker run -v `pwd`:/opt/kaldi-gstreamer-server-test shookees/kaldi-gstreamer-server bash -c "pip install coverage==4.3 &&
                                                                                                  cd /opt/kaldi-gstreamer-server-test &&
-                                                                                                 GST_PLUGIN_PATH=/opt/gst-kaldi-nnet2-online coverage run -m unittest discover kaldigstserver *_test.py &&
-                                                                                                 coverage report"
+                                                                                                 GST_PLUGIN_PATH=/opt/gst-kaldi-nnet2-online:/opt/kaldi/src/gst-plugin coverage run -m unittest discover kaldigstserver *_test.py"
 
 after_script:
-  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
+  - codeclimate-test-reporter

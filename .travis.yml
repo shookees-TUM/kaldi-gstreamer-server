@@ -9,4 +9,4 @@ before_install:
  - docker pull shookees/kaldi-gstreamer-server
 
 script:
- - docker run -v `pwd`:/opt/kaldi-gstreamer-server-test shookees/kaldi-gstreamer-server bash -c "cd /opt/kaldi-gstreamer-server-test && python -m unittest discover kaldigstserver *_test.py"
+ - docker run -v `pwd`:/opt/kaldi-gstreamer-server-test shookees/kaldi-gstreamer-server bash -c "cd /opt/kaldi-gstreamer-server-test && GST_PLUGIN_PATH=/opt/gst-kaldi-nnet2-online python -m unittest discover kaldigstserver *_test.py"

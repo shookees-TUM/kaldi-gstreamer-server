@@ -13,9 +13,7 @@ before_install:
   - docker pull shookees/kaldi-gstreamer-server
 
 before_script:
-  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-  - chmod +x ./cc-test-reporter
-  - ./cc-test-reporter before-build
+  - pip install codeclimate-test-reporter
 
 script:
  - docker run -v `pwd`:/opt/kaldi-gstreamer-server-test shookees/kaldi-gstreamer-server bash -c "pip install coverage &&
@@ -24,4 +22,4 @@ script:
                                                                                                  coverage report"
 
 after_script:
-  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
+  - codeclimate-test-reporter --file .coverage

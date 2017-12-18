@@ -1,6 +1,6 @@
 env:
   global:
-    - CC_TEST_REPORTER_ID=6c7aa04b7c8ea5bd90845bc6dccbad4d23785e7d263be4e27214d6d0b4f457de
+    - CODECLIMATE_REPO_TOKEN=6c7aa04b7c8ea5bd90845bc6dccbad4d23785e7d263be4e27214d6d0b4f457de
 
 sudo: required
 

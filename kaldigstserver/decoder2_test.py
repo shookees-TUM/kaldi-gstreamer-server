@@ -84,7 +84,9 @@ class DecoderPipeline2Tests(unittest.TestCase):
 
         while not self.finished:
             time.sleep(1)
-        self.assertEqual([u"üks kaks kolm neli", u"viis kuus seitse kaheksa"], self.final_hyps)
+        self.assertEqual([u"üks kaks kolm neli",
+                          u"viis kuus seitse kaheksa"], 
+                         self.final_hyps)
 
     def test8k(self):
         self.decoder_pipeline.init_request("test8k", "audio/x-raw, layout=(string)interleaved, rate=(int)8000, format=(string)S16LE, channels=(int)1")
@@ -98,7 +100,9 @@ class DecoderPipeline2Tests(unittest.TestCase):
 
         while not self.finished:
             time.sleep(1)
-        self.assertEqual([u"üks kaks kolm neli", u"viis kuus seitse kaheksa"], self.final_hyps)
+        self.assertEqual([u"üks kaks kolm neli",
+                          u"viis kuus seitse kaheksa"],
+                         self.final_hyps)
 
     def testDisconnect(self):
         self.decoder_pipeline.init_request("testDisconnect", "audio/x-raw, layout=(string)interleaved, rate=(int)8000, format=(string)S16LE, channels=(int)1")
@@ -122,7 +126,9 @@ class DecoderPipeline2Tests(unittest.TestCase):
 
         while not self.finished:
             time.sleep(1)
-        self.assertEqual([u"see on esimene lause pärast mida tuleb vaikus", u"nüüd tuleb teine lause"], self.final_hyps)
+        self.assertEqual([u"see on esimene lause pärast mida tuleb vaikus",
+                          u"nüüd tuleb teine lause"],
+                         self.final_hyps)
 
     def testOgg(self):
         self.decoder_pipeline.init_request("testOgg", "")
@@ -136,8 +142,8 @@ class DecoderPipeline2Tests(unittest.TestCase):
 
         while not self.finished:
             time.sleep(1)
-
-        self.assertEqual(u"see on esimene lause see on teine lause", " ".join(self.final_hyps))
+        self.assertEqual(u"see on esimene lause see on teine lause", 
+                         " ".join(self.final_hyps))
 
 def main():
     unittest.main()

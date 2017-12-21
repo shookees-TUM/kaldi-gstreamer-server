@@ -17,24 +17,35 @@ def run_async(func):
 
 def content_type_to_caps(content_type):
     """
-    Converts MIME-style raw audio content type specifier to GStreamer CAPS string
+    Converts MIME-style raw audio content
+    type specifier to GStreamer CAPS string
     """
-    default_attributes= {"rate": 16000, "format" : "S16LE", "channels" : 1, "layout" : "interleaved"}
+    default_attributes = {"rate": 16000,
+                          "format": "S16LE",
+                          "channels": 1,
+                          "layout": "interleaved"}
     media_type, _, attr_string = content_type.replace(";", ",").partition(",")
     if media_type in ["audio/x-raw", "audio/x-raw-int"]:
         media_type = "audio/x-raw"
         attributes = default_attributes
-        for (key,_,value) in [p.partition("=") for p in attr_string.split(",")]:
+        for (key, _, value) in [p.partition("=")
+                                for p in attr_string.split(",")]:
             attributes[key.strip()] = value.strip()
-        return "%s, %s" % (media_type, ", ".join(["%s=%s" % (key, value) for (key,value) in attributes.iteritems()]))
+        return "%s, %s" % (media_type, ", ".join(
+            ["%s=%s" % (key, value)
+                for (key, value) in attributes.iteritems()]))
     else:
         return content_type
 
+
 def main():
-    logging.basicConfig(level=logging.DEBUG, format="%(levelname)8s %(asctime)s %(message)s ")
+    logging.basicConfig(level=logging.DEBUG,
+                        format="%(levelname)8s %(asctime)s %(message)s ")
     logging.debug('Starting up server')
-    tornado.options.define("certfile", default="", help="certificate file for secured SSL connection")
-    tornado.options.define("keyfile", default="", help="key file for secured SSL connection")
+    tornado.options.define("certfile", default="",
+                           help="certificate file for secured SSL connection")
+    tornado.options.define("keyfile", default="",
+                           help="key file for secured SSL connection")
 
     tornado.options.parse_command_line()
     app = Application()

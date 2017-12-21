@@ -5,7 +5,8 @@ import json
 
 class WorkerSocketHandler(tornado.websocket.WebSocketHandler):
     def __init__(self, application, request, **kwargs):
-        tornado.websocket.WebSocketHandler.__init__(self, application, request, **kwargs)
+        tornado.websocket.WebSocketHandler.__init__(self, application,
+                                                    request, **kwargs)
         self.client_socket = None
 
     # needed for Tornado 4.0

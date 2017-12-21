@@ -19,7 +19,10 @@ class DecoderSocketHandler(tornado.websocket.WebSocketHandler):
     def open(self):
         self.id = str(uuid.uuid4())
         logging.info("%s: OPEN" % (self.id))
-        logging.info("%s: Request arguments: %s" % (self.id, " ".join(["%s=\"%s\"" % (a, self.get_argument(a)) for a in self.request.arguments])))
+        logging.info("%s: Request arguments: %s"
+                     % (self.id, " ".join(["%s=\"%s\""
+                                          % (a, self.get_argument(a)) for a
+                        in self.request.arguments])))
         self.user_id = self.get_argument("user-id", "none", True)
         self.content_id = self.get_argument("content-id", "none", True)
         self.worker = None
@@ -31,12 +34,19 @@ class DecoderSocketHandler(tornado.websocket.WebSocketHandler):
 
             content_type = self.get_argument("content-type", None, True)
             if content_type:
-                logging.info("%s: Using content type: %s" % (self.id, content_type))
+                logging.info("%s: Using content type: %s"
+                             % (self.id, content_type))
 
-            self.worker.write_message(json.dumps(dict(id=self.id, content_type=content_type, user_id=self.user_id, content_id=self.content_id)))
+            self.worker.write_message(json.dumps(
+                                      dict(id=self.id,
+                                           content_type=content_type,
+                                           user_id=self.user_id,
+                                           content_id=self.content_id)))
         except KeyError:
-            logging.warn("%s: No worker available for client request" % self.id)
-            event = dict(status=common.STATUS_NOT_AVAILABLE, message="No decoder available, try again later")
+            logging.warn("%s: No worker available for client request"
+                         % self.id)
+            event = dict(status=common.STATUS_NOT_AVAILABLE,
+                         message="No decoder available, try again later")
             self.send_event(event)
             self.close()
 
@@ -54,7 +64,8 @@ class DecoderSocketHandler(tornado.websocket.WebSocketHandler):
 
     def on_message(self, message):
         assert self.worker is not None
-        logging.info("%s: Forwarding client message (%s) of length %d to worker" % (self.id, type(message), len(message)))
+        logging.info("%s: Forwarding client message (%s) of length %d\
+ to worker" % (self.id, type(message), len(message)))
         if isinstance(message, unicode):
             self.worker.write_message(message, binary=False)
         else:

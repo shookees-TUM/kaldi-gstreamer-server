@@ -1,6 +1,7 @@
-import tornado.web
 import json
 import os
+
+import tornado.web
 
 
 class Application(tornado.web.Application):

@@ -1,7 +1,8 @@
-import tornado.web
-import logging
 import codecs
+import logging
 import time
+
+import tornado.web
 
 
 class ReferenceHandler(tornado.web.RequestHandler):

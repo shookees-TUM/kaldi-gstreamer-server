@@ -1,9 +1,10 @@
-from ws4py.client.threadedclient import WebSocketClient
-import threading
-import sys
-import Queue
 import json
 import os
+import Queue
+import sys
+import threading
+
+from ws4py.client.threadedclient import WebSocketClient
 
 
 class MyClient(WebSocketClient):

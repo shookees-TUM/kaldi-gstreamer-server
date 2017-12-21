@@ -1,6 +1,7 @@
-import tornado.websocket
-import logging
 import json
+import logging
+
+import tornado.websocket
 
 
 class DecoderSocketHandler(tornado.websocket.WebSocketHandler):

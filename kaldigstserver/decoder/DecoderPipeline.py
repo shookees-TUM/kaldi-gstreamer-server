@@ -1,10 +1,11 @@
 import logging
-import thread
 import os
+import thread
 
 import gi
-gi.require_version('Gst', '1.0')
 from gi.repository import GObject, Gst
+
+gi.require_version('Gst', '1.0')
 
 GObject.threads_init()
 Gst.init(None)

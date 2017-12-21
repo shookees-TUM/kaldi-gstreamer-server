@@ -1,9 +1,10 @@
-import tornado.web
-import tornado.gen
-from Queue import Queue
-import uuid
 import json
 import logging
+import uuid
+from Queue import Queue
+
+import tornado.gen
+import tornado.web
 
 
 @tornado.web.stream_request_body

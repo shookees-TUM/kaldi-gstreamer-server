@@ -1,27 +1,24 @@
+import argparse
+import base64
+import codecs
+import json
+import locale
 import logging
 import logging.config
-import time
-import thread
-import argparse
-from gi.repository import GObject
-import yaml
-import json
 import sys
-import locale
-import codecs
-import zlib
-import base64
+import thread
 import time
+import zlib
+from subprocess import PIPE, Popen
 
-    
-from ws4py.client.threadedclient import WebSocketClient
-import ws4py.messaging
-
-from decoder import DecoderPipeline
-from decoder2 import DecoderPipeline2
 import common
 import tornado.process
-from subprocess import Popen, PIPE
+import ws4py.messaging
+import yaml
+from decoder import DecoderPipeline
+from decoder2 import DecoderPipeline2
+from gi.repository import GObject
+from ws4py.client.threadedclient import WebSocketClient
 
 CONNECT_TIMEOUT = 5
 SILENCE_TIMEOUT = 5
@@ -87,4 +84,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

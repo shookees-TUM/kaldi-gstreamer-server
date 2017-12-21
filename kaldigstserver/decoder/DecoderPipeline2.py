@@ -1,10 +1,11 @@
 import os
 import thread
-import loggin
+
 import gi
+import loggin
+from gi.repository import GObject, Gst
 
 gi.require_version('Gst', '1.0')
-from gi.repository import GObject, Gst
 
 GObject.threads_init()
 Gst.init(None)

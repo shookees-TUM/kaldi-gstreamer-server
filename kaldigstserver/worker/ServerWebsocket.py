@@ -1,25 +1,22 @@
+import argparse
+import base64
+import codecs
+import json
+import locale
 import logging
 import logging.config
-import time
-import thread
-import argparse
-from gi.repository import GObject
-import yaml
-import json
 import sys
-import locale
-import codecs
-import zlib
-import base64
+import thread
 import time
+import zlib
 
-
-from ws4py.client.threadedclient import WebSocketClient
+import common
 import ws4py.messaging
-
+import yaml
 from decoder import DecoderPipeline
 from decoder2 import DecoderPipeline2
-import common
+from gi.repository import GObject
+from ws4py.client.threadedclient import WebSocketClient
 
 logger = logging.getLogger(__name__)
 

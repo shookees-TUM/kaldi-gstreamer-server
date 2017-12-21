@@ -1,5 +1,6 @@
-import tornado.websocket
 import logging
+
+import tornado.websocket
 
 
 class StatusSocketHandler(tornado.websocket.WebSocketHandler):

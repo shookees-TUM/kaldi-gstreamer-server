@@ -10,7 +10,6 @@ import thread
 import time
 import zlib
 
-import common
 import ws4py.messaging
 import yaml
 from decoder import DecoderPipeline
@@ -63,7 +62,7 @@ class ServerWebsocket(WebSocketClient):
             if time.time() - self.last_decoder_message > SILENCE_TIMEOUT:
                 logger.warning("%s: More than %d seconds from last decoder hypothesis update, cancelling" % (self.request_id, SILENCE_TIMEOUT))
                 self.finish_request()
-                event = dict(status=common.STATUS_NO_SPEECH)
+                event = dict(status=STATUS_NO_SPEECH)
                 try:
                     self.send(json.dumps(event))
                 except:
@@ -165,7 +164,7 @@ class ServerWebsocket(WebSocketClient):
         if final:
             logger.info("%s: After postprocessing: %s" % (self.request_id, processed_transcript))
 
-        event = dict(status=common.STATUS_SUCCESS,
+        event = dict(status=STATUS_SUCCESS,
                      segment=self.num_segments,
                      result=dict(hypotheses=[dict(transcript=processed_transcript)], final=final))
         try:
@@ -178,7 +177,7 @@ class ServerWebsocket(WebSocketClient):
         self.last_decoder_message = time.time()
         full_result = json.loads(full_result_json)
         full_result['segment'] = self.num_segments
-        if full_result.get("status", -1) == common.STATUS_SUCCESS:
+        if full_result.get("status", -1) == STATUS_SUCCESS:
             logger.debug(u"%s: Before postprocessing: %s" % (self.request_id, repr(full_result).decode("unicode-escape")))
             full_result = self.post_process_full(full_result)
             logger.info("%s: Postprocessing done." % self.request_id)
@@ -210,7 +209,7 @@ class ServerWebsocket(WebSocketClient):
             processed_transcript = self.post_process(self.partial_transcript)
             logger.debug("%s: Postprocessing done." % self.request_id)
 
-            event = dict(status=common.STATUS_SUCCESS,
+            event = dict(status=STATUS_SUCCESS,
                          segment=self.num_segments,
                          result=dict(hypotheses=[dict(transcript=processed_transcript)], final=False))
             self.send(json.dumps(event))
@@ -218,7 +217,7 @@ class ServerWebsocket(WebSocketClient):
             logger.info("%s: Postprocessing final result.."  % self.request_id)
             processed_transcript = self.post_process(self.partial_transcript)
             logger.info("%s: Postprocessing done." % self.request_id)
-            event = dict(status=common.STATUS_SUCCESS,
+            event = dict(status=STATUS_SUCCESS,
                          segment=self.num_segments,
                          result=dict(hypotheses=[dict(transcript=processed_transcript)], final=True))
             self.send(json.dumps(event))
@@ -234,7 +233,7 @@ class ServerWebsocket(WebSocketClient):
 
     def _on_error(self, error):
         self.state = self.STATE_FINISHED
-        event = dict(status=common.STATUS_NOT_ALLOWED, message=error)
+        event = dict(status=STATUS_NOT_ALLOWED, message=error)
         try:
             self.send(json.dumps(event))
         except:
@@ -246,7 +245,7 @@ class ServerWebsocket(WebSocketClient):
         if hasattr(self.decoder_pipeline, 'get_adaptation_state'):
             logger.info("%s: Sending adaptation state to client..." % (self.request_id))
             adaptation_state = self.decoder_pipeline.get_adaptation_state()
-            event = dict(status=common.STATUS_SUCCESS,
+            event = dict(status=STATUS_SUCCESS,
                          adaptation_state=dict(id=self.request_id,
                                                value=base64.b64encode(zlib.compress(adaptation_state)),
                                                type="string+gzip+base64",

@@ -11,7 +11,6 @@ import time
 import zlib
 from subprocess import PIPE, Popen
 
-import common
 import tornado.process
 import ws4py.messaging
 import yaml

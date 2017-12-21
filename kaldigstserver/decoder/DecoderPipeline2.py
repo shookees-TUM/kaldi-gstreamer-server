@@ -2,7 +2,7 @@ import os
 import thread
 
 import gi
-import loggin
+import logging
 from gi.repository import GObject, Gst
 
 gi.require_version('Gst', '1.0')
@@ -18,13 +18,13 @@ class DecoderPipeline2(object):
     def __init__(self, conf={}):
         logger.info("Creating decoder using conf: %s" % conf)
         self.create_pipeline(conf)
-        self.outdir = conf.get("out-dir", None)
-        if self.outdir:
-            if not os.path.exists(self.outdir):
-                os.makedirs(self.outdir)
-            elif not os.path.isdir(self.outdir):
+        self.output_dir = conf.get("out-dir", None)
+        if self.output_dir:
+            if not os.path.exists(self.output_dir):
+                os.makedirs(self.output_dir)
+            elif not os.path.isdir(self.output_dir):
                 raise Exception("Output directory %s already\
- exists as a file" % self.outdir)
+ exists as a file" % self.output_dir)
 
         self.result_handler = None
         self.full_result_handler = None
@@ -155,7 +155,7 @@ class DecoderPipeline2(object):
 
     def finish_request(self):
         logger.info("%s: Resetting decoder state" % self.request_id)
-        if self.outdir:
+        if self.output_dir:
             self.filesink.set_state(Gst.State.NULL)
             self.filesink.set_property('location', "/dev/null")
             self.filesink.set_state(Gst.State.PLAYING)
@@ -174,11 +174,11 @@ class DecoderPipeline2(object):
             self.appsrc.set_property("caps", None)
             pass
 
-        if self.outdir:
+        if self.output_dir:
             self.pipeline.set_state(Gst.State.PAUSED)
             self.filesink.set_state(Gst.State.NULL)
             self.filesink.set_property('location', "%s/%s.raw"
-                                       % (self.outdir, id))
+                                       % (self.output_dir, id))
             self.filesink.set_state(Gst.State.PLAYING)
 
         self.pipeline.set_state(Gst.State.PLAYING)

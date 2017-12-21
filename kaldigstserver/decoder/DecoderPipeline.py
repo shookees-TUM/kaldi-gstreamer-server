@@ -19,13 +19,13 @@ class DecoderPipeline(object):
         logger.info("Creating decoder using conf: %s" % conf)
         self.use_cutter = conf.get("use-vad", False)
         self.create_pipeline(conf)
-        self.outdir = conf.get("out-dir", None)
-        if self.outdir:
-            if not os.path.exists(self.outdir):
-                os.mkdir(self.outdir)
-            elif not os.path.isdir(self.outdir):
+        self.output_dir = conf.get("out-dir", None)
+        if self.output_dir:
+            if not os.path.exists(self.output_dir):
+                os.mkdir(self.output_dir)
+            elif not os.path.isdir(self.output_dir):
                 raise Exception("Output directory %s already exists\
- as a file" % self.outdir)
+ as a file" % self.output_dir)
 
         self.word_handler = None
         self.eos_handler = None
@@ -47,9 +47,9 @@ class DecoderPipeline(object):
         self.asr = Gst.ElementFactory.make("onlinegmmdecodefaster", "asr")
         self.fakesink = Gst.ElementFactory.make("fakesink", "fakesink")
 
-        for (key, val) in conf.get("decoder", {}).iteritems():
-            logger.info("Setting decoder property: %s = %s" % (key, val))
-            self.asr.set_property(key, val)
+        for (key, value) in conf.get("decoder", {}).iteritems():
+            logger.info("Setting decoder property: %s = %s" % (key, value))
+            self.asr.set_property(key, value)
 
         self.appsrc.set_property("is-live", True)
         self.filesink.set_property("location", "/dev/null")
@@ -145,7 +145,7 @@ class DecoderPipeline(object):
 
     def finish_request(self):
         logger.info('%s: Finishing request' % self.request_id)
-        if self.outdir:
+        if self.output_dir:
             self.filesink.set_state(Gst.State.NULL)
             self.filesink.set_property('location', "/dev/null")
             self.filesink.set_state(Gst.State.PLAYING)
@@ -163,11 +163,11 @@ class DecoderPipeline(object):
             self.appsrc.set_property("caps", None)
             pass
 
-        if self.outdir:
+        if self.output_dir:
             self.pipeline.set_state(Gst.State.PAUSED)
             self.filesink.set_state(Gst.State.NULL)
             self.filesink.set_property('location', "%s/%s.raw"
-                                       % (self.outdir, id))
+                                       % (self.output_dir, id))
             self.filesink.set_state(Gst.State.PLAYING)
 
         self.pipeline.set_state(Gst.State.PLAYING)

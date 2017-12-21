@@ -1,22 +1,16 @@
-"""
-Created on May 17, 2013
-
-@author: tanel
-"""
 import gi
-
 gi.require_version('Gst', '1.0')
 from gi.repository import GObject, Gst
 
 GObject.threads_init()
 Gst.init(None)
+
 import logging
 import thread
 import os
 
 logger = logging.getLogger(__name__)
 
-import pdb
 
 class DecoderPipeline(object):
     def __init__(self, conf={}):

@@ -1,8 +1,3 @@
-"""
-Created on May 17, 2013
-
-@author: tanel
-"""
 import gi
 
 gi.require_version('Gst', '1.0')
@@ -16,7 +11,6 @@ import os
 
 logger = logging.getLogger(__name__)
 
-import pdb
 
 class DecoderPipeline2(object):
     def __init__(self, conf={}):

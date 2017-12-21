@@ -9,7 +9,7 @@ import unittest
 from gi.repository import GObject, Gst
 import thread
 import logging
-from decoder2 import DecoderPipeline2
+from kaldigstserver.decoder.DecoderPipeline2 import DecoderPipeline2
 import time
 
 class DecoderPipeline2Tests(unittest.TestCase):

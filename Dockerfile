@@ -1,6 +1,7 @@
 FROM debian:9
 LABEL Author="Paulius Sukys <paul.sukys@gmail.com>"
 
+# TODO: for next image release, move python3.6 installation here
 RUN apt update && apt install -y autoconf \
                                  automake \
                                  g++ \
@@ -65,6 +66,12 @@ RUN rm -rf /opt/gst-kaldi-nnet2/.git && \
 
 RUN git clone https://github.com/shookees-TUM/kaldi-gstreamer-server.git && \
     rm -rf /opt/kaldi-gstreamer-server/.git/ && \
-    rm -rf /opt/kaldi-gstreamer-server/test/
+    rm -rf /opt/kaldi-gstreamer-server/test/    
+
+# FIXME: python3.6 install
+RUN echo 'deb http://ftp.de.debian.org/debian testing main' | tee -a /etc/apt/sources.list.d/debian-testing.list && \
+    echo 'APT::Default-Release "stable";' | tee -a /etc/apt/apt.conf.d/00local && \
+    apt update && \
+    apt-get -t testing install -y python3.6
 
 ENV GST_PLUGIN_PATH=/opt/kaldi/src/gst-plugin/:/opt/gst-kaldi-nnet2-online/

@@ -6,7 +6,7 @@ import locale
 import logging
 import logging.config
 import sys
-import thread
+import _thread
 import time
 import zlib
 

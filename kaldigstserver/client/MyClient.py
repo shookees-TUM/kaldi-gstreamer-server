@@ -29,8 +29,8 @@ class MyClient(WebSocketClient):
     def opened(self):
         def send_data_to_ws():
             if self.send_adaptation_state_filename is not None:
-                print >> sys.stderr, "Sending adaptation state from %s"\
-                     % self.send_adaptation_state_filename
+                print(file=sys.stderr, "Sending adaptation state from {}".\
+                      self.send_adaptation_state_filename)
                 try:
                     adaptation_state_props = json.load(
                         open(self.send_adaptation_state_filename, "r"))
@@ -38,13 +38,13 @@ class MyClient(WebSocketClient):
                               (dict(adaptation_state=adaptation_state_props)))
                 except:
                     e = sys.exc_info()[0]
-                    print >> sys.stderr,\
-                        "Failed to send adaptation state: ",  e
+                    print(file=sys.stderr,\
+                        "Failed to send adaptation state: {}".format(e))
             with self.audiofile as audiostream:
                 for block in iter(lambda:
                                   audiostream.read(self.byterate/4), ""):
                     self.send_data(block)
-            print >> sys.stderr, "Audio sent, now sending EOS"
+            print(file=sys.stderr, "Audio sent, now sending EOS")
             self.send("EOS")
 
         t = threading.Thread(target=send_data_to_ws)
@@ -57,23 +57,23 @@ class MyClient(WebSocketClient):
                 trans = response['result']['hypotheses'][0]['transcript']
                 if response['result']['final']:
                     self.final_hyps.append(trans)
-                    print >> sys.stderr, '\r%s' % trans.replace("\n", "\\n")
+                    print(file=sys.stderr, '\r{}'.format(trans.replace("\n", "\\n")))
                 else:
                     print_trans = trans.replace("\n", "\\n")
                     if len(print_trans) > 80:
                         print_trans = "... %s" % print_trans[-76:]
-                    print >> sys.stderr, '\r%s' % print_trans,
+                    print(file=sys.stderr, '\r{}'.format(print_trans)
             if 'adaptation_state' in response:
                 if self.save_adaptation_state_filename:
-                    print >> sys.stderr, "Saving adaptation state to %s"\
-                        % self.save_adaptation_state_filename
+                    print(file=sys.stderr, "Saving adaptation state to {}".format(\
+                          self.save_adaptation_state_filename))
                     with open(self.save_adaptation_state_filename, "w") as f:
                         f.write(json.dumps(response['adaptation_state']))
         else:
-            print >> sys.stderr, "Received error from server (status %d)"\
-                % response['status']
+            print(file=sys.stderr, "Received error from server (status {})".format(\
+                  response['status']))
             if 'message' in response:
-                print >> sys.stderr, "Error message:",  response['message']
+                print(file=sys.stderr, "Error message: {}".format(response['message']))
 
     def get_full_hyp(self, timeout=60):
         return self.final_hyp_queue.get(timeout)

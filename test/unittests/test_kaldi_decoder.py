@@ -6,10 +6,12 @@ Created on Jun 27, 2013
 @author: tanel
 '''
 import unittest
-from gi.repository import GObject, Gst
-import thread
+import gi
+gi.require_version('Gst', '1.0')
+from gi.repository import GLib, Gst
+import _thread
 import logging
-from kaldigstserver.decoder.DecoderPipeline import DecoderPipeline
+from kaldigstserver.decoder.KaldiDecoderPipeline import KaldiDecoderPipeline
 import time
 
 class DecoderPipelineTests(unittest.TestCase):
@@ -24,15 +26,15 @@ class DecoderPipelineTests(unittest.TestCase):
                             "word-syms" : "test/models/estonian/tri2b_mmi_pruned/words.txt",
                             "fst" : "test/models/estonian/tri2b_mmi_pruned/HCLG.fst",
                             "silence-phones" : "6"}
-            cls.decoder_pipeline = DecoderPipeline({"decoder" : decoder_conf})
+            cls.decoder_pipeline = KaldiDecoderPipeline({"decoder" : decoder_conf})
             cls.words = []
             cls.finished = False
 
             cls.decoder_pipeline.set_word_handler(cls.word_getter)
             cls.decoder_pipeline.set_eos_handler(cls.set_finished, cls.finished)
 
-            loop = GObject.MainLoop()
-            thread.start_new_thread(loop.run, ())
+            loop = GLib.MainLoop()
+            _thread.start_new_thread(loop.run, ())
 
     def word_getter(cls, word):
         cls.words.append(word)
@@ -48,7 +50,7 @@ class DecoderPipelineTests(unittest.TestCase):
     def testCancelAfterEOS(self):
         self.decoder_pipeline.init_request("testCancelAfterEOS", "audio/x-raw, layout=(string)interleaved, rate=(int)16000, format=(string)S16LE, channels=(int)1")
         f = open("test/data/1234-5678.raw", "rb")
-        self.send_data(iter(lambda: f.read(8000), ""))
+        self.send_data(iter(lambda: f.read(8000), b''))
 
         self.decoder_pipeline.end_request()
         self.decoder_pipeline.cancel()
@@ -62,7 +64,7 @@ class DecoderPipelineTests(unittest.TestCase):
     def test12345678(self):
         self.decoder_pipeline.init_request("test12345678", "audio/x-raw, layout=(string)interleaved, rate=(int)16000, format=(string)S16LE, channels=(int)1")
         f = open("test/data/1234-5678.raw", "rb")
-        self.send_data(iter(lambda: f.read(8000), ""))
+        self.send_data(iter(lambda: f.read(8000), b''))
 
         self.decoder_pipeline.end_request()
 
@@ -74,7 +76,7 @@ class DecoderPipelineTests(unittest.TestCase):
     def testWav(self):
         self.decoder_pipeline.init_request("testWav", "")
         f = open("test/data/lause2.wav", "rb")
-        self.send_data(iter(lambda: f.read(16000*2*2/4), ""))
+        self.send_data(iter(lambda: f.read(int(16000*2*2/4)), b''))
 
         self.decoder_pipeline.end_request()
 
@@ -86,7 +88,7 @@ class DecoderPipelineTests(unittest.TestCase):
     def testOgg(self):
         self.decoder_pipeline.init_request("testOgg", "")
         f = open("test/data/test_2lauset.ogg", "rb")
-        self.send_data(iter(lambda: f.read(86*1024/8/4), ""))
+        self.send_data(iter(lambda: f.read(int(86*1024/8/4)), b''))
 
         self.decoder_pipeline.end_request()
 
@@ -106,7 +108,7 @@ class DecoderPipelineTests(unittest.TestCase):
         def do_shit():
             decoder_pipeline.init_request("test0", "audio/x-raw, layout=(string)interleaved, rate=(int)16000, format=(string)S16LE, channels=(int)1")
             f = open("test/data/1234-5678.raw", "rb")
-            self.send_data(iter(lambda: f.read(8000), ""))
+            self.send_data(iter(lambda: f.read(8000), b''))
             
             decoder_pipeline.end_request()
     
@@ -133,7 +135,7 @@ class DecoderPipelineTests(unittest.TestCase):
         decoder_pipeline.process_data(f.read())
         time.sleep(3)
         decoder_pipeline.cancel()
-        print "Pipeline cancelled"
+        print("Pipeline cancelled")
         
         words = []
         finished[0] = False
@@ -149,7 +151,7 @@ class DecoderPipelineTests(unittest.TestCase):
         #test cancelling without anything sent
         decoder_pipeline.init_request("test0", "audio/x-raw, layout=(string)interleaved, rate=(int)16000, format=(string)S16LE, channels=(int)1")
         decoder_pipeline.cancel()
-        print "Pipeline cancelled"
+        print("Pipeline cancelled")
         
         words = []
         finished[0] = False

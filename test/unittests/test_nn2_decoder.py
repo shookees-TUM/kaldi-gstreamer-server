@@ -6,10 +6,10 @@ Created on Jun 27, 2013
 @author: tanel
 '''
 import unittest
-from gi.repository import GObject, Gst
-import thread
+from gi.repository import GLib, Gst
+import _thread
 import logging
-from kaldigstserver.decoder.DecoderPipeline2 import DecoderPipeline2
+from kaldigstserver.decoder.Nn2DecoderPipeline import Nn2DecoderPipeline
 import time
 
 class DecoderPipeline2Tests(unittest.TestCase):
@@ -29,7 +29,7 @@ class DecoderPipeline2Tests(unittest.TestCase):
                             "lattice-beam": 6.0,
                             "do-endpointing" : True,
                             "endpoint-silence-phones":"1:2:3:4:5:6:7:8:9:10"}
-            cls.decoder_pipeline = DecoderPipeline2({"decoder" : decoder_conf})
+            cls.decoder_pipeline = Nn2DecoderPipeline({"decoder" : decoder_conf})
             cls.final_hyps = []
             cls.words = []
             cls.finished = False
@@ -37,8 +37,8 @@ class DecoderPipeline2Tests(unittest.TestCase):
             cls.decoder_pipeline.set_result_handler(cls.result_getter)
             cls.decoder_pipeline.set_eos_handler(cls.set_finished, cls.finished)
 
-            loop = GObject.MainLoop()
-            thread.start_new_thread(loop.run, ())
+            loop = GLib.MainLoop()
+            _thread.start_new_thread(loop.run, ())
 
     def result_getter(cls, hyp, final):
         if final:

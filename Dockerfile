@@ -72,6 +72,8 @@ RUN git clone https://github.com/shookees-TUM/kaldi-gstreamer-server.git && \
 RUN echo 'deb http://ftp.de.debian.org/debian testing main' | tee -a /etc/apt/sources.list.d/debian-testing.list && \
     echo 'APT::Default-Release "stable";' | tee -a /etc/apt/apt.conf.d/00local && \
     apt update && \
-    apt-get -t testing install -y python3.6
+    apt-get -t testing install -y python3.6 python3-pip
 
-ENV GST_PLUGIN_PATH=/opt/kaldi/src/gst-plugin/:/opt/gst-kaldi-nnet2-online/
+RUN pip3 install ws4py==0.3.2 tornado
+
+ENV GST_PLUGIN_PATH=/opt/kaldi/src/gst-plugin/:/opt/gst-kaldi-nnet2-online

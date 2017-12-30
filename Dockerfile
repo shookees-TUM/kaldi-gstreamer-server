@@ -1,7 +1,7 @@
 FROM debian:9
 LABEL Author="Paulius Sukys <paul.sukys@gmail.com>"
 
-# TODO: for next image release, move python3.6 installation here
+
 RUN apt update && apt install -y autoconf \
                                  automake \
                                  g++ \
@@ -13,30 +13,36 @@ RUN apt update && apt install -y autoconf \
                                  gstreamer1.0-plugins-base \
                                  gstreamer1.0-plugins-ugly  \
                                  libatlas3-base \
+                                 libglib2.0-dev \
                                  libgstreamer1.0-dev \
                                  libtool-bin \
                                  libjansson4 \
                                  libjansson-dev \
+                                 python \
                                  make \
-                                 python2.7 \
-                                 python3 \
-                                 python-pip \
-                                 python-yaml \
-                                 python-simplejson \
-                                 python-gi \
+                                 python3-pip \
+                                 python3-gi \
                                  subversion \
                                  wget \
                                  zlib1g-dev
+
+# Use testing repos for python3.6
+RUN echo 'deb http://ftp.de.debian.org/debian testing main' | tee -a /etc/apt/sources.list.d/debian-testing.list && \
+    echo 'APT::Default-Release "stable";' | tee -a /etc/apt/apt.conf.d/00local && \
+    apt update && \
+    apt-get -t testing install -y python3.6 python3-pip
+
+RUN apt -t testing install python3.6
 
 RUN apt clean autoclean && \
     apt autoremove -y && \
     rm -rf /var/lib/apt/lists/*
 
 # Server dependencies, TODO: move to requirements.txt or even better pypy package
-RUN pip install ws4py==0.3.2 tornado
+RUN pip3 install ws4py==0.3.2 tornado PyYAML simplejson
 
 # Set default Python
-RUN update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.6 1
 
 # Set default Shell
 RUN chsh -s $(which bash)
@@ -67,13 +73,5 @@ RUN rm -rf /opt/gst-kaldi-nnet2/.git && \
 RUN git clone https://github.com/shookees-TUM/kaldi-gstreamer-server.git && \
     rm -rf /opt/kaldi-gstreamer-server/.git/ && \
     rm -rf /opt/kaldi-gstreamer-server/test/    
-
-# FIXME: python3.6 install
-RUN echo 'deb http://ftp.de.debian.org/debian testing main' | tee -a /etc/apt/sources.list.d/debian-testing.list && \
-    echo 'APT::Default-Release "stable";' | tee -a /etc/apt/apt.conf.d/00local && \
-    apt update && \
-    apt-get -t testing install -y python3.6 python3-pip
-
-RUN pip3 install ws4py==0.3.2 tornado
 
 ENV GST_PLUGIN_PATH=/opt/kaldi/src/gst-plugin/:/opt/gst-kaldi-nnet2-online

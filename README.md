@@ -2,7 +2,7 @@ Kaldi GStreamer server
 ======================
 [![GitHub license](https://img.shields.io/github/license/shookees-TUM/kaldi-gstreamer-server.svg)](https://github.com/shookees-TUM/kaldi-gstreamer-server/blob/master/LICENSE)
 [![Maintainability](https://api.codeclimate.com/v1/badges/f4aa2466d0fb3b3dc3a8/maintainability)](https://codeclimate.com/github/shookees-TUM/kaldi-gstreamer-server/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/f4aa2466d0fb3b3dc3a8/test_coverage)](https://codeclimate.com/github/shookees-TUM/kaldi-gstreamer-server/test_coverage)
+[![Build Status](https://travis-ci.org/shookees-TUM/kaldi-gstreamer-server.svg?branch=master)](https://travis-ci.org/shookees-TUM/kaldi-gstreamer-server)
 
 This is a real-time full-duplex speech recognition server, based on
 the Kaldi toolkit and the GStreamer framework and implemented in Python.

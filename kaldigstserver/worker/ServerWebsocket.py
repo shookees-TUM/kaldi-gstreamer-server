@@ -12,8 +12,8 @@ import zlib
 
 import ws4py.messaging
 import yaml
-from decoder import DecoderPipeline
-from decoder2 import DecoderPipeline2
+from kaldigstserver.decoder.KaldiDecoderPipeline import KaldiDecoderPipeline
+from kaldigstserver.decoder.Nn2DecoderPipeline import Nn2DecoderPipeline
 from gi.repository import GObject
 from ws4py.client.threadedclient import WebSocketClient
 

@@ -128,6 +128,7 @@ class DecoderPipeline2Tests(unittest.TestCase):
         self.assertEqual([u"see on esimene lause pärast mida tuleb vaikus",
                           u"nüüd tuleb teine lause"],
                          self.final_hyps)
+        f.close()
 
 
 def main():

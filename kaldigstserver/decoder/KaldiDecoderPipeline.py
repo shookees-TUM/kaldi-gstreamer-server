@@ -32,7 +32,7 @@ class KaldiDecoderPipeline(DecoderPipeline):
         self.eos_handler = None
         self.request_id = "<undefined>"
 
-    def create_pipeline(self, conf):
+    def create_gst_elements(self):
         self.appsrc = Gst.ElementFactory.make("appsrc", "appsrc")
 
         self.decodebin = Gst.ElementFactory.make("decodebin", "decodebin")
@@ -48,6 +48,7 @@ class KaldiDecoderPipeline(DecoderPipeline):
         self.asr = Gst.ElementFactory.make("onlinegmmdecodefaster", "asr")
         self.fakesink = Gst.ElementFactory.make("fakesink", "fakesink")
 
+    def config_gst_elements(self, conf):
         for (key, value) in conf.get("decoder", {}).items():
             self.logger.info("Setting decoder property: %s = %s" % (key, value))
             self.asr.set_property(key, value)
@@ -60,18 +61,8 @@ class KaldiDecoderPipeline(DecoderPipeline):
         self.cutter.set_property("threshold", 0.01)
         if self.use_cutter:
             self.asr.set_property("silent", True)
-        self.logger.info('Created GStreamer elements')
 
-        self.pipeline = Gst.Pipeline()
-        for element in [self.appsrc, self.decodebin, self.audioconvert,
-                        self.audioresample, self.tee, self.queue1,
-                        self.filesink, self.queue2, self.cutter, self.asr,
-                        self.fakesink]:
-            self.logger.debug("Adding %s to the pipeline" % element)
-            self.pipeline.add(element)
-
-        self.logger.info('Linking GStreamer elements')
-
+    def link_gst_elements(self):
         self.appsrc.link(self.decodebin)
         self.decodebin.connect('pad-added', self._connect_decoder)
         if self.use_cutter:
@@ -88,6 +79,24 @@ class KaldiDecoderPipeline(DecoderPipeline):
         self.queue2.link(self.asr)
 
         self.asr.link(self.fakesink)
+
+    def create_pipeline(self, conf):
+        self.create_gst_elements()
+
+        self.config_gst_elements(conf)
+        self.logger.info('Created GStreamer elements')
+
+        self.pipeline = Gst.Pipeline()
+        for element in [self.appsrc, self.decodebin, self.audioconvert,
+                        self.audioresample, self.tee, self.queue1,
+                        self.filesink, self.queue2, self.cutter, self.asr,
+                        self.fakesink]:
+            self.logger.debug("Adding %s to the pipeline" % element)
+            self.pipeline.add(element)
+
+        self.logger.info('Linking GStreamer elements')
+
+        self.link_gst_elements()
 
         #  Create bus and connect several handlers
         self.bus = self.pipeline.get_bus()

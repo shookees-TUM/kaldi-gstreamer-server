@@ -106,7 +106,7 @@ class ServerWebsocket(WebSocketClient):
                             logger.info("%s: Setting adaptation state to user-provided value" % (self.request_id))
                             self.decoder_pipeline.set_adaptation_state(adaptation_state)
                         else:
-                            logger.warning("%s: Cannot handle adaptation state type " % (self.request_id, as_props.get('type', "")))
+                            logger.warning("%s: Cannot handle adaptation state type %s" % (self.request_id, as_props.get('type', "")))
                     else:
                         logger.warning("%s: Got JSON message but don't know what to do with it" % (self.request_id))
             else:

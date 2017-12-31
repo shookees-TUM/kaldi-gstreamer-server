@@ -4,6 +4,12 @@ import tornado.websocket
 
 
 class StatusSocketHandler(tornado.websocket.WebSocketHandler):
+    def on_message(self, message):
+        pass
+
+    def data_received(self, chunk):
+        pass
+
     # needed for Tornado 4.0
     def check_origin(self, origin):
         return True

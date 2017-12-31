@@ -4,6 +4,9 @@ import tornado.web
 
 
 class MainHandler(tornado.web.RequestHandler):
+    def data_received(self, chunk):
+        pass
+
     def get(self):
         current_directory = os.path.dirname(os.path.abspath(__file__))
         parent_directory = os.path.join(current_directory, os.pardir)

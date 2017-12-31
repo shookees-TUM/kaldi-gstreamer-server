@@ -5,6 +5,9 @@ import tornado.websocket
 
 
 class WorkerSocketHandler(tornado.websocket.WebSocketHandler):
+    def data_received(self, chunk):
+        pass
+
     def __init__(self, application, request, **kwargs):
         tornado.websocket.WebSocketHandler.__init__(self, application,
                                                     request, **kwargs)

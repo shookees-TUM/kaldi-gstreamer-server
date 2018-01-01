@@ -94,6 +94,7 @@ class DecoderPipelineTests(unittest.TestCase):
 
         while not self.finished:
             pass
+        f.close()
         self.assertEqual("see on esimene lause <#s> see on teine lause <#s>".split(), self.words)
 
 

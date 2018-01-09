@@ -21,20 +21,20 @@ class DecoderPipelineTests(unittest.TestCase):
         logging.basicConfig(level=logging.INFO)
 
     def setUp(cls):
-            decoder_conf = {"model" : "/opt/kaldi-gstreamer-server-test/test/models/estonian/tri2b_mmi_pruned/final.mdl",
-                            "lda-mat" : "/opt/kaldi-gstreamer-server-test/test/models/estonian/tri2b_mmi_pruned/final.mat",
-                            "word-syms" : "/opt/kaldi-gstreamer-server-test/test/models/estonian/tri2b_mmi_pruned/words.txt",
-                            "fst" : "/opt/kaldi-gstreamer-server-test/test/models/estonian/tri2b_mmi_pruned/HCLG.fst",
-                            "silence-phones" : "6"}
-            cls.decoder_pipeline = KaldiDecoderPipeline({"decoder" : decoder_conf})
-            cls.words = []
-            cls.finished = False
+        decoder_conf = {"model" : "/opt/kaldi-gstreamer-server-test/test/models/estonian/tri2b_mmi_pruned/final.mdl",
+                        "lda-mat" : "/opt/kaldi-gstreamer-server-test/test/models/estonian/tri2b_mmi_pruned/final.mat",
+                        "word-syms" : "/opt/kaldi-gstreamer-server-test/test/models/estonian/tri2b_mmi_pruned/words.txt",
+                        "fst" : "/opt/kaldi-gstreamer-server-test/test/models/estonian/tri2b_mmi_pruned/HCLG.fst",
+                        "silence-phones" : "6"}
+        cls.decoder_pipeline = KaldiDecoderPipeline({"decoder" : decoder_conf})
+        cls.words = []
+        cls.finished = False
 
-            cls.decoder_pipeline.set_word_handler(cls.word_getter)
-            cls.decoder_pipeline.set_eos_handler(cls.set_finished, cls.finished)
+        cls.decoder_pipeline.set_word_handler(cls.word_getter)
+        cls.decoder_pipeline.set_eos_handler(cls.set_finished, cls.finished)
 
-            loop = GLib.MainLoop()
-            _thread.start_new_thread(loop.run, ())
+        loop = GLib.MainLoop()
+        _thread.start_new_thread(loop.run, ())
 
     def word_getter(cls, word):
         cls.words.append(word)
@@ -56,9 +56,8 @@ class DecoderPipelineTests(unittest.TestCase):
         while not self.finished:
             pass
 
+        f.close()
         self.assertEqual(["üks", "kaks", "kolm", "neli", "<#s>", "viis", "kuus", "seitse", "kaheksa", "<#s>"], self.words)
-        
-
 
     def test12345678(self):
         self.decoder_pipeline.init_request("test12345678", "audio/x-raw, layout=(string)interleaved, rate=(int)16000, format=(string)S16LE, channels=(int)1")
@@ -67,9 +66,10 @@ class DecoderPipelineTests(unittest.TestCase):
 
         self.decoder_pipeline.end_request()
 
-
         while not self.finished:
             pass
+
+        f.close()
         self.assertEqual(["üks", "kaks", "kolm", "neli", "<#s>", "viis", "kuus", "seitse", "kaheksa", "<#s>"], self.words)
 
     def testWav(self):
@@ -79,9 +79,10 @@ class DecoderPipelineTests(unittest.TestCase):
 
         self.decoder_pipeline.end_request()
 
-
         while not self.finished:
             pass
+
+        f.close()
         self.assertEqual("see on teine lause <#s>".split(), self.words)
 
     def testOgg(self):
@@ -91,26 +92,22 @@ class DecoderPipelineTests(unittest.TestCase):
 
         self.decoder_pipeline.end_request()
 
-
         while not self.finished:
             pass
+
         f.close()
         self.assertEqual("see on esimene lause <#s> see on teine lause <#s>".split(), self.words)
-
-
 
     def __testDecoder(self):
         finished = [False]
 
-
-
-
         def do_shit():
-            decoder_pipeline.init_request("test0", "audio/x-raw, layout=(string)interleaved, rate=(int)16000, format=(string)S16LE, channels=(int)1")
+            self.decoder_pipeline.init_request("test0", "audio/x-raw, layout=(string)interleaved, rate=(int)16000, format=(string)S16LE, channels=(int)1")
             f = open("/opt/kaldi-gstreamer-server-test/test/data/1234-5678.raw", "rb")
             self.send_data(iter(lambda: f.read(8000), b''))
             
-            decoder_pipeline.end_request()
+            self.decoder_pipeline.end_request()
+            f.close()
     
         do_shit()
     
@@ -130,55 +127,48 @@ class DecoderPipelineTests(unittest.TestCase):
         
         # Now test cancelation of a long submitted file
         words = []        
-        decoder_pipeline.init_request("test0", "audio/x-raw, layout=(string)interleaved, rate=(int)16000, format=(string)S16LE, channels=(int)1")
+        self.decoder_pipeline.init_request("test0", "audio/x-raw, layout=(string)interleaved, rate=(int)16000, format=(string)S16LE, channels=(int)1")
         f = open("/opt/kaldi-gstreamer-server-test/test/data/etteytlus.raw", "rb")
-        decoder_pipeline.process_data(f.read())
+        self.decoder_pipeline.process_data(f.read())
         time.sleep(3)
-        decoder_pipeline.cancel()
+        self.decoder_pipeline.cancel()
         print("Pipeline cancelled")
         
         words = []
         finished[0] = False
-        decoder_pipeline.init_request("test0", "audio/x-raw, layout=(string)interleaved, rate=(int)16000, format=(string)S16LE, channels=(int)1")
+        self.decoder_pipeline.init_request("test0", "audio/x-raw, layout=(string)interleaved, rate=(int)16000, format=(string)S16LE, channels=(int)1")
         # read and send everything
         f = open("/opt/kaldi-gstreamer-server-test/test/data/lause2.raw", "rb")
-        decoder_pipeline.process_data(f.read(10*16000))
-        decoder_pipeline.end_request()
+        self.decoder_pipeline.process_data(f.read(10*16000))
+        self.decoder_pipeline.end_request()
         while not finished[0]:
             pass
         self.assertItemsEqual(["see", "on", "teine", "lause", "<#s>"], words, "Recognition result")
         
         #test cancelling without anything sent
-        decoder_pipeline.init_request("test0", "audio/x-raw, layout=(string)interleaved, rate=(int)16000, format=(string)S16LE, channels=(int)1")
-        decoder_pipeline.cancel()
+        self.decoder_pipeline.init_request("test0", "audio/x-raw, layout=(string)interleaved, rate=(int)16000, format=(string)S16LE, channels=(int)1")
+        self.decoder_pipeline.cancel()
         print("Pipeline cancelled")
         
         words = []
         finished[0] = False
-        decoder_pipeline.init_request("test0", "audio/x-wav")
+        self.decoder_pipeline.init_request("test0", "audio/x-wav")
         # read and send everything
         f = open("/opt/kaldi-gstreamer-server-test/test/data/lause2.wav", "rb")
-        decoder_pipeline.process_data(f.read())
-        decoder_pipeline.end_request()
+        self.decoder_pipeline.process_data(f.read())
+        self.decoder_pipeline.end_request()
         while not finished[0]:
             pass
         self.assertItemsEqual(["see", "on", "teine", "lause", "<#s>"], words, "Recognition result")
 
         words = []
         finished[0] = False
-        decoder_pipeline.init_request("test0", "audio/ogg")
+        self.decoder_pipeline.init_request("test0", "audio/ogg")
         # read and send everything
         f = open("/opt/kaldi-gstreamer-server-test/test/data/test_2lauset.ogg", "rb")
-        decoder_pipeline.process_data(f.read(10*16000))
+        self.decoder_pipeline.process_data(f.read(10*16000))
 
-        decoder_pipeline.end_request()
+        self.decoder_pipeline.end_request()
         while not finished[0]:
             pass
         self.assertItemsEqual("see on esimene lause <#s> see on teine lause <#s>".split(), words, "Recognition result")
-
-
-def main():
-    unittest.main()
-
-if __name__ == '__main__':
-    main()

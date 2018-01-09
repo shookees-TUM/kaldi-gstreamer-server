@@ -10,7 +10,6 @@ from gi.repository import GLib, Gst
 import _thread
 import logging
 from kaldigstserver.decoder.Nn2DecoderPipeline import Nn2DecoderPipeline
-import time
 
 class DecoderPipeline2Tests(unittest.TestCase):
 
@@ -19,26 +18,26 @@ class DecoderPipeline2Tests(unittest.TestCase):
         logging.basicConfig(level=logging.INFO)
 
     def setUp(self):
-            decoder_conf = {"model" : "/opt/kaldi-gstreamer-server-test/test/models/estonian/nnet2_online_ivector/final.mdl",
-                            "word-syms" : "/opt/kaldi-gstreamer-server-test/test/models/estonian/nnet2_online_ivector/words.txt",
-                            "fst" : "/opt/kaldi-gstreamer-server-test/test/models/estonian/nnet2_online_ivector/HCLG.fst",
-                            "mfcc-config" : "/opt/kaldi-gstreamer-server-test/test/models/estonian/nnet2_online_ivector/conf/mfcc.conf",
-                            "ivector-extraction-config": "/opt/kaldi-gstreamer-server-test/test/models/estonian/nnet2_online_ivector/conf/ivector_extractor.conf",
-                            "max-active": 7000,
-                            "beam": 11.0,
-                            "lattice-beam": 6.0,
-                            "do-endpointing" : True,
-                            "endpoint-silence-phones":"1:2:3:4:5:6:7:8:9:10"}
-            self.decoder_pipeline = Nn2DecoderPipeline({"decoder" : decoder_conf})
-            self.final_hyps = []
-            self.words = []
-            self.finished = False
+        decoder_conf = {"model" : "/opt/kaldi-gstreamer-server-test/test/models/estonian/nnet2_online_ivector/final.mdl",
+                        "word-syms" : "/opt/kaldi-gstreamer-server-test/test/models/estonian/nnet2_online_ivector/words.txt",
+                        "fst" : "/opt/kaldi-gstreamer-server-test/test/models/estonian/nnet2_online_ivector/HCLG.fst",
+                        "mfcc-config" : "/opt/kaldi-gstreamer-server-test/test/models/estonian/nnet2_online_ivector/conf/mfcc.conf",
+                        "ivector-extraction-config": "/opt/kaldi-gstreamer-server-test/test/models/estonian/nnet2_online_ivector/conf/ivector_extractor.conf",
+                        "max-active": 7000,
+                        "beam": 11.0,
+                        "lattice-beam": 6.0,
+                        "do-endpointing" : True,
+                        "endpoint-silence-phones":"1:2:3:4:5:6:7:8:9:10"}
+        self.decoder_pipeline = Nn2DecoderPipeline({"decoder" : decoder_conf})
+        self.final_hyps = []
+        self.words = []
+        self.finished = False
 
-            self.decoder_pipeline.set_result_handler(self.result_getter)
-            self.decoder_pipeline.set_eos_handler(self.set_finished)
+        self.decoder_pipeline.set_result_handler(self.result_getter)
+        self.decoder_pipeline.set_eos_handler(self.set_finished)
 
-            loop = GLib.MainLoop()
-            _thread.start_new_thread(loop.run, ())
+        loop = GLib.MainLoop()
+        _thread.start_new_thread(loop.run, ())
 
     def result_getter(self, hyp, final):
         if final:
@@ -84,7 +83,6 @@ class DecoderPipeline2Tests(unittest.TestCase):
 
         self.decoder_pipeline.end_request()
 
-
         while not self.finished:
             pass
         self.assertEqual([u"üks kaks kolm neli",
@@ -129,10 +127,3 @@ class DecoderPipeline2Tests(unittest.TestCase):
                           u"nüüd tuleb teine lause"],
                          self.final_hyps)
         f.close()
-
-
-def main():
-    unittest.main()
-
-if __name__ == '__main__':
-    main()

@@ -1,1 +1,4 @@
-ws4py
+ws4py==0.3.2 
+tornado
+PyYAML
+simplejson

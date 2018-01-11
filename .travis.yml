@@ -12,13 +12,5 @@ services:
 before_install:
   - docker pull shookees/kaldi-gstreamer-server
 
-before_script:
-  - pip install codeclimate-test-reporter
-
 script:
- - docker run -v `pwd`:/opt/kaldi-gstreamer-server-test shookees/kaldi-gstreamer-server bash -c "pip install coverage==4.3 &&
-                                                                                                 cd /opt/kaldi-gstreamer-server-test &&
-                                                                                                 GST_PLUGIN_PATH=/opt/gst-kaldi-nnet2-online:/opt/kaldi/src/gst-plugin coverage run -m unittest discover kaldigstserver *_test.py"
-
-after_script:
-  - codeclimate-test-reporter
+ - docker run -v `pwd`:/opt/kaldi-gstreamer-server-test shookees/kaldi-gstreamer-server bash -c "cd /opt/kaldi-gstreamer-server-test/ && python3.5 -m unittest discover test/unittests test_*.py"

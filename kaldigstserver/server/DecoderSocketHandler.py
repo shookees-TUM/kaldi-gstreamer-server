@@ -5,6 +5,9 @@ import tornado.websocket
 
 
 class DecoderSocketHandler(tornado.websocket.WebSocketHandler):
+    def data_received(self, chunk):
+        pass
+
     # needed for Tornado 4.0
     def check_origin(self, origin):
         return True
@@ -44,8 +47,8 @@ class DecoderSocketHandler(tornado.websocket.WebSocketHandler):
                                            user_id=self.user_id,
                                            content_id=self.content_id)))
         except KeyError:
-            logging.warn("%s: No worker available for client request"
-                         % self.id)
+            logging.warning("%s: No worker available for client request"
+                            % self.id)
             event = dict(status=STATUS_NOT_AVAILABLE,
                          message="No decoder available, try again later")
             self.send_event(event)

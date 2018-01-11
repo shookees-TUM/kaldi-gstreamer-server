@@ -44,8 +44,8 @@ class HttpChunkedRecognizeHandler(tornado.web.RequestHandler):
                                              user_id=self.user_id,
                                              content_id=self.content_id)))
         except KeyError:
-            logging.warn("%s: No worker available for client request"
-                         % self.id)
+            logging.warning("%s: No worker available for client request"
+                            % self.id)
             self.set_status(503)
             self.finish("No workers available")
 
@@ -111,7 +111,7 @@ class HttpChunkedRecognizeHandler(tornado.web.RequestHandler):
                         event["result"]["hypotheses"][0]["transcript"])
             except:
                 e = sys.exc_info()[0]
-                logging.warn("Failed to extract hypothesis\
+                logging.warning("Failed to extract hypothesis\
  from recognition result:" + e)
         elif event["status"] != 0:
             self.error_status = event["status"]

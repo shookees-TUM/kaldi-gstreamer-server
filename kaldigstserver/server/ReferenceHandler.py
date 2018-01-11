@@ -6,6 +6,9 @@ import tornado.web
 
 
 class ReferenceHandler(tornado.web.RequestHandler):
+    def data_received(self, chunk):
+        pass
+
     def post(self, *args, **kwargs):
         content_id = self.request.headers.get("Content-Id")
         if content_id:

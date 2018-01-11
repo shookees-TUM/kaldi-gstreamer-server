@@ -6,7 +6,7 @@ import locale
 import logging
 import logging.config
 import sys
-import thread
+import _thread
 import time
 import zlib
 from subprocess import PIPE, Popen
@@ -14,10 +14,11 @@ from subprocess import PIPE, Popen
 import tornado.process
 import ws4py.messaging
 import yaml
-from decoder import DecoderPipeline
-from decoder2 import DecoderPipeline2
+from kaldigstserver.decoder.KaldiDecoderPipeline import KaldiDecoderPipeline
+from kaldigstserver.decoder.Nn2DecoderPipeline import Nn2DecoderPipeline
 from gi.repository import GObject
 from ws4py.client.threadedclient import WebSocketClient
+from kaldigstserver.worker.ServerWebsocket import ServerWebsocket
 
 CONNECT_TIMEOUT = 5
 SILENCE_TIMEOUT = 5
@@ -62,9 +63,9 @@ def main():
     global SILENCE_TIMEOUT
     SILENCE_TIMEOUT = conf.get("silence-timeout", 5)
     if USE_NNET2:
-        decoder_pipeline = DecoderPipeline2(conf)
+        decoder_pipeline = Nn2DecoderPipeline(conf)
     else:
-        decoder_pipeline = DecoderPipeline(conf)
+        decoder_pipeline = KaldiDecoderPipeline(conf)
 
 
     loop = GObject.MainLoop()

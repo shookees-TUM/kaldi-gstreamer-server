@@ -55,7 +55,7 @@ def main():
                   send_adaptation_state_filename=args.send_adaptation_state)
     ws.connect()
     result = ws.get_full_hyp()
-    print result.encode('utf-8')
+    print(result.encode('utf-8'))
 
 if __name__ == "__main__":
     main()
